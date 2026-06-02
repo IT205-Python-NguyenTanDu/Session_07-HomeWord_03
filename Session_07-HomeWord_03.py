@@ -1,74 +1,114 @@
-raws_data = "eMP-001; nguyen van a ;0987654321;sale | Emp-002; Tran Thi B; 0912-345-678 ; mkt | EMP-003 ; le van C ; 0988abc123 ; IT"
+# ==========================
+# HỆ THỐNG QUẢN LÝ NHÂN SỰ
+# ==========================
+
+raw_data = (
+    " eMP-001; nguyen van a ;0987654321;sale | "
+    "Emp-002; Tran Thi B; 0912-345-678 ; mkt | "
+    "EMP-003 ; le van C ; 0988abc123 ; IT "
+)
+
+
+def process_phone(phone):
+    """
+    Chuẩn hóa số điện thoại
+    - Xóa dấu '-'
+    - Nếu hợp lệ: che 6 số đầu
+    - Nếu không hợp lệ: Invalid Format
+    """
+    phone = phone.strip().replace("-", "")
+
+    if phone.isdigit():
+        return "******" + phone[-4:]
+
+    return "Invalid Format"
+
+
+def parse_employees():
+    """
+    Chuyển dữ liệu thô thành danh sách nhân viên đã chuẩn hóa
+    """
+    employee_list = []
+
+    employees = raw_data.split("|")
+
+    for employee in employees:
+        fields = employee.split(";")
+
+        employee_id = fields[0].strip().upper()
+        name = fields[1].strip().title()
+        phone = process_phone(fields[2])
+        department = fields[3].strip().upper()
+
+        employee_list.append(
+            {
+                "id": employee_id,
+                "name": name,
+                "phone": phone,
+                "department": department
+            }
+        )
+
+    return employee_list
+
 
 while True:
-    print("==== HỆ THỐNG QUẢN LÍ NHÂN SỰ ====")
-    print("1. Hiển thị chuỗi dữ liệu gốc\n"
-        "2. Chuẩn hóa dữ liệu và in báo cáo\n"
-        "3. Tìm kiếm nhân viên theo mã ID\n"
-        "4. Thoát chương trình\n")
+    print("\n===== HỆ THỐNG QUẢN LÝ NHÂN SỰ =====")
+    print("1. Hiển thị chuỗi dữ liệu gốc")
+    print("2. Chuẩn hóa dữ liệu và in báo cáo")
+    print("3. Tìm kiếm nhân viên theo mã ID")
+    print("4. Thoát chương trình")
 
-    choice =  input("Nhập lựa chọn của bạn (1-4): ")
-    if not choice.isdigit():
-        print("Vui lòng nhập lựa chọn là một số trong khoảng 1-4!\n")
-        continue
-    choice = int(choice)
-    match choice:
-        case 1:
-            print("==== Dữ liệu gốc ====")
-            print(raws_data)
-            print("\n")
-        case 2:
-            print("==== Báo cáo nhân sự ====")
-            print(f"{'ID':^10} {'Họ tên':^20} {'{Phòng ban':^15} {'Số điện thoại':^15}")
-            print("="*65)
-            employees = raws_data.split("|")
+    choice = input("Nhập lựa chọn: ").strip()
 
-            for employees in employees:
-                field = employees.split(";")
-                id = field[0].strip().upper()
-                fullname = field[1].strip().title()
-                department = field[3].strip().upper()
-                phone = field[2].strip().replace("-", "")
+    # Chức năng 1
+    if choice == "1":
+        print("\nDỮ LIỆU GỐC:")
+        print(raw_data)
 
-                if phone.isdigit():
-                    phone = "******" + phone[-4:]
-                else:
-                    phone = "Invalid Format"
+    # Chức năng 2
+    elif choice == "2":
+        employee_list = parse_employees()
 
-                print(f"{id:^10} {fullname:^20} {department:^15} {phone:^15}")
-                print("=" * 65)
-        case 3:
-            search_id = input("Nhập ID cần tìm: ")
-            search_id = search_id.strip().upper()
-            employees = raws_data.split("|")
-            flag = False
-            for employees in employees:
-                field = employees.split(";")
-                id = field[0].upper()
-                fullname = field[1].strip().title()
-                department = field[3].strip().upper()
-                phone = field[2].strip().replace("-", "")
+        print("\nBÁO CÁO NHÂN SỰ")
+        print("-" * 70)
 
-                if search_id == id:
+        print(
+            f"{'ID':<12}"
+            f"{'HỌ TÊN':<25}"
+            f"{'SỐ ĐIỆN THOẠI':<20}"
+            f"{'PHÒNG BAN':<10}"
+        )
 
-                    if phone.isdigit():
-                        phone = "******" + phone[-4:]
-                    else:
-                        phone = "Invalid Format"
+        print("-" * 70)
 
-                    print("\n===== THÔNG TIN NHÂN VIÊN =====")
-                    print(f"ID        : {id}")
-                    print(f"Họ tên    : {fullname}")
-                    print(f"Điện thoại: {phone}")
-                    print(f"Phòng ban : {department}")
-                    print("\n")
+        for emp in employee_list:
+            print(
+                f"{emp['id']:<12}"
+                f"{emp['name']:<25}"
+                f"{emp['phone']:<20}"
+                f"{emp['department']:<10}"
+            )
 
-                    flag = True
-                    break
+    # Chức năng 3
+    elif choice == "3":
+        search_id = input("Nhập mã nhân viên: ")
 
-            if not flag:
-                print(f"Không tìm  thấy nhân viên có id là {search_id}")
+        search_id = search_id.strip().upper()
 
-        case 4:
-            print("Thoát chương trình!")
-            break
+        employee_list = parse_employees()
+
+        found = False
+
+        for emp in employee_list:
+            if emp["id"] == search_id:
+                print("\nTHÔNG TIN NHÂN VIÊN")
+                print(f"ID: {emp['id']}")
+                print(f"Họ tên: {emp['name']}")
+                print(f"Số điện thoại: {emp['phone']}")
+                print(f"Phòng ban: {emp['department']}")
+
+                found = True
+                break
+
+        if not found:
